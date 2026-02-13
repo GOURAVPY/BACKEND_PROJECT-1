@@ -1,0 +1,12 @@
+{
+  "name": "backend2",
+  "version": "1.0.0",
+  "description": "This is Backend project for deep Knowlaga",
+  "license": "ISC",
+  "author": "Gourav suman",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
