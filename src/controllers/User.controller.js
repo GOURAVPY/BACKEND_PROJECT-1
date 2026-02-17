@@ -1,7 +1,8 @@
 import { Apierror } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.models.js';
-import { uploadOnCloudinary } from '../utils/filleUplode.js';
+import { uploadoncloudinary } from '../utils/filleUplode.js';
+import { ApiResponse } from '../utils/apoResponse.js';
 
 const registerUser = asyncHandler(async (req, res) => {
   //get user data from frantend
@@ -34,8 +35,8 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   //upload them to cloudinary ,avatar
-  const avatar = await uploadOnCloudinary(avatarLocalpath);
-  const coverimage = await uploadOnCloudinary(coverImageLocalpath);
+  const avatar = await uploadoncloudinary(avatarLocalpath);
+  const coverimage = await uploadoncloudinary(coverImageLocalpath);
 
   if (!avatar) {
     throw new Apierror(400, 'avatar is required');
@@ -44,22 +45,24 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     fullname,
     avatar: avatar.url,
-    coverImage: coverImage?.url || '',
+    coverImage: coverimage?.url || '',
     email,
     password,
     username: username.toLowercase(),
   });
 
- const idusercreated = await User.findById(user._id).select(
-  "-password -refreshToken"
- )
- if(!idusercreated){
-  throw new Apierror(500,"Something want wrong while registrig the user ");
-  
- }
   //remove passward and refresh token from response
+  const idUserCreated = await User.findById(user._id).select(
+    '-password -refreshToken'
+  );
   //chech for user creation
+  if (!idUserCreated) {
+    throw new Apierror(500, 'Something want wrong while registrig the user ');
+  }
   //return res
+  return res
+    .status(201)
+    .json(new ApiResponse(200, idUserCreated, 'User registered Succesfully'));
 });
 
 export { registerUser };

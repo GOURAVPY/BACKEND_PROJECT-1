@@ -32,15 +32,15 @@ const userSchema = new mongoose.Schema(
     coverImage: {
       type: String, // cloudinary public id
     },
-    wathchList: [
+    watchList: [
       {
-        type: Schema.Types.objectid,
-        ref: 'video',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Video',
       },
     ],
     password: {
       type: String,
-      required: [true, 'password is required'],
+      required: [true, 'Password is required'],
     },
     refreshToken: {
       type: String,
@@ -49,15 +49,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
 userSchema.pre('save', async function (next) {
-  if (!this.isModifed('password')) return next();
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.isPassswordCorrect = async function (passsword) {
-  return await bcrypt.compare(passsword, this.passsword);
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
 };
+
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
@@ -73,6 +76,8 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
+
+// Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
